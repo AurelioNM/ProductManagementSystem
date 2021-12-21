@@ -2,14 +2,16 @@ package br.com.Impact.ProductManagementSystem.controller;
 
 import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.model.Product;
+import br.com.Impact.ProductManagementSystem.model.form.ProductForm;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,8 +41,12 @@ public class BRLProductController {
 
     @PostMapping
     @Transactional
-    public ProductDTO postProduct(@RequestBody @Valid) {
+    public ResponseEntity<ProductDTO> postProduct(@RequestBody @Valid ProductForm productForm, UriComponentsBuilder uriBuilder) {
+        Product product = productForm.convertToProduct();
+        productRepository.save(product);
 
+        URI uri = uriBuilder.path("/Products/{id}").buildAndExpand(product.getId()).toUri();
+        return ResponseEntity.created(uri).body(new ProductDTO(product));
     }
 
 }
