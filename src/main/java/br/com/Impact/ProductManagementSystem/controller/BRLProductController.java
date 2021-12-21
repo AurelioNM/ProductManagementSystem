@@ -42,6 +42,7 @@ public class BRLProductController {
     @PostMapping
     @Transactional
     public ResponseEntity<ProductDTO> postProduct(@RequestBody @Valid ProductForm productForm, UriComponentsBuilder uriBuilder) {
+
         Product product = productForm.convertToProduct();
         productRepository.save(product);
 
@@ -49,4 +50,27 @@ public class BRLProductController {
         return ResponseEntity.created(uri).body(new ProductDTO(product));
     }
 
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductForm productForm) {
+
+        Optional<Product> optional = productRepository.findById(id);
+        if (optional.isPresent()) {
+            Product product = productForm.update(id, productRepository);
+            return ResponseEntity.ok(new ProductDTO(product));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteProductById(@PathVariable Long id) {
+
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            productRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
