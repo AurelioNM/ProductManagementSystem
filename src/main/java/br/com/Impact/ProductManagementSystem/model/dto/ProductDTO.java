@@ -1,4 +1,4 @@
-package br.com.Impact.ProductManagementSystem.controller.dto;
+package br.com.Impact.ProductManagementSystem.model.dto;
 
 import br.com.Impact.ProductManagementSystem.model.Product;
 
