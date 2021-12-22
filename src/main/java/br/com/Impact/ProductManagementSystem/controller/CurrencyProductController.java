@@ -16,7 +16,7 @@ public class CurrencyProductController {
     private ProductRepository productRepository;
 
     @Autowired
-    private RestTemplate restTemplate
+    private RestTemplate restTemplate;
 
     public void getCurrencies() {
         restTemplate.getForObject("https://economia.awesomeapi.com.br/all", )
