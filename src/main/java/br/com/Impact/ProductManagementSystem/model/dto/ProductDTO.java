@@ -9,12 +9,12 @@ public class ProductDTO {
 
     private Long id;
     private String name;
-    private BigDecimal price;
+    private BigDecimal priceBRL;
 
     public ProductDTO(Product product) {
         this.id = product.getId();
         this.name = product.getName();
-        this.price = product.getPrice();
+        this.priceBRL = product.getPriceBRL();
     }
 
     public static List<ProductDTO> convertToDTO(List<Product> products) {
@@ -29,7 +29,7 @@ public class ProductDTO {
         return name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getPriceBRL() {
+        return priceBRL;
     }
 }

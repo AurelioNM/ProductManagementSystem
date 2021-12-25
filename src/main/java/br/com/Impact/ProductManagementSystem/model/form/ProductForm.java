@@ -15,18 +15,18 @@ public class ProductForm {
     @NotNull @NotEmpty @Length(min = 2)
     private String name;
     @NotNull @Digits(integer = 15, fraction = 2)
-    private BigDecimal price;
+    private BigDecimal priceBRL;
 
 
     public Product convertToProduct() {
-        return new Product(name, price);
+        return new Product(name, priceBRL);
     }
 
     public Product update(Long id, ProductRepository productRepository) {
         Product product = productRepository.getById(id);
 
         product.setName(this.name);
-        product.setPrice(this.price);
+        product.setPriceBRL(this.priceBRL);
         product.setUpdatedAt(LocalDateTime.now());
 
         return product;
@@ -40,12 +40,12 @@ public class ProductForm {
         this.name = name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getPriceBRL() {
+        return priceBRL;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setPriceBRL(BigDecimal priceBRL) {
+        this.priceBRL = priceBRL;
     }
 
 }

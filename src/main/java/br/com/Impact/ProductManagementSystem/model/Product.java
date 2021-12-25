@@ -15,13 +15,14 @@ public class Product {
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private BigDecimal price;
+    private BigDecimal priceBRL;
+
 
     public Product() { }
 
     public Product(String name, BigDecimal price) {
         this.name = name;
-        this.price = price;
+        this.priceBRL = priceBRL;
     }
 
     public Long getId() {
@@ -56,11 +57,11 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getPriceBRL() {
+        return priceBRL;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setPriceBRL(BigDecimal priceBRL) {
+        this.priceBRL = priceBRL;
     }
 }

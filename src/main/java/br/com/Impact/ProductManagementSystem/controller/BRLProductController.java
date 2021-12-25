@@ -7,6 +7,7 @@ import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
@@ -18,6 +19,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/Products")
 public class BRLProductController {
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private ProductRepository productRepository;
