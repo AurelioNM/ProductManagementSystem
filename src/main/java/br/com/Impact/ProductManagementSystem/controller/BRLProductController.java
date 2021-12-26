@@ -4,6 +4,7 @@ import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.model.Product;
 import br.com.Impact.ProductManagementSystem.model.form.ProductForm;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +13,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.net.URL;
+import java.util.*;
 
 @RestController
 @RequestMapping("/Products")
@@ -26,6 +30,24 @@ public class BRLProductController {
     @Autowired
     private ProductRepository productRepository;
 
+    private String jsonString(String link) throws IOException {
+        URL url = new URL(link);
+        String temp = "";
+            Scanner scan = new Scanner(url.openStream());
+            while(scan.hasNext()) {
+                temp = scan.nextLine();
+            }
+            return temp;
+    }
+
+    @GetMapping("/teste")
+    public void getProductsWithCurrencies() throws IOException {
+        String json = jsonString("https://economia.awesomeapi.com.br/all");
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String,Map<String, String>> map = mapper.readValue(json, Map.class);
+
+        String s = map.get("USD").get("ask");
+    }
 
     @GetMapping
     public List<ProductDTO> getProducts() {
