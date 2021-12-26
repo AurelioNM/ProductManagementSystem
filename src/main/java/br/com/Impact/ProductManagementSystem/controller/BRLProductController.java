@@ -2,9 +2,7 @@ package br.com.Impact.ProductManagementSystem.controller;
 
 import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.model.Product;
-import br.com.Impact.ProductManagementSystem.model.form.ProductForm;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +11,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -24,66 +19,70 @@ import java.util.*;
 @RequestMapping("/Products")
 public class BRLProductController {
 
+    private String stringJson = convertJsonToString("https://economia.awesomeapi.com.br/all");
+
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
     private ProductRepository productRepository;
 
-    private String jsonString(String link) throws IOException {
+    public BRLProductController() throws Exception {
+    }
+
+    public String convertJsonToString(String link) throws Exception {
         URL url = new URL(link);
         String temp = "";
-            Scanner scan = new Scanner(url.openStream());
-            while(scan.hasNext()) {
-                temp = scan.nextLine();
-            }
-            return temp;
+        Scanner scan = new Scanner(url.openStream());
+        while(scan.hasNext()) {
+            temp = scan.nextLine();
+        }
+        return temp;
     }
 
-    @GetMapping("/teste")
-    public void getProductsWithCurrencies() throws IOException {
-        String json = jsonString("https://economia.awesomeapi.com.br/all");
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,Map<String, String>> map = mapper.readValue(json, Map.class);
-
-        String s = map.get("USD").get("ask");
-    }
 
     @GetMapping
     public List<ProductDTO> getProducts() {
 
         List<Product> products = productRepository.findAll();
-        return ProductDTO.convertToDTO(products);
+        return ProductDTO.convertToDTO(products, stringJson);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductByID(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductByID(@PathVariable Long id) throws Exception{
 
         Optional<Product> product = productRepository.findById(id);
         return product
-                .map(value -> ResponseEntity.ok(new ProductDTO(value)))
+                .map(value -> {
+                    try {
+                        return ResponseEntity.ok(new ProductDTO(value, stringJson));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ProductDTO> postProduct(@RequestBody @Valid ProductForm productForm, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<ProductDTO> postProduct(@RequestBody @Valid Product product, UriComponentsBuilder uriBuilder) throws Exception {
 
-        Product product = productForm.convertToProduct();
         productRepository.save(product);
 
         URI uri = uriBuilder.path("/Products/{id}").buildAndExpand(product.getId()).toUri();
-        return ResponseEntity.created(uri).body(new ProductDTO(product));
+        return ResponseEntity.created(uri).body(new ProductDTO(product, stringJson));
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductForm productForm) {
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody @Valid Product product) throws Exception {
 
         Optional<Product> optional = productRepository.findById(id);
         if (optional.isPresent()) {
-            Product product = productForm.update(id, productRepository);
-            return ResponseEntity.ok(new ProductDTO(product));
+            Product updatedProduct = product.update(id, productRepository);
+            return ResponseEntity.ok(new ProductDTO(updatedProduct, stringJson));
         }
         return ResponseEntity.notFound().build();
     }

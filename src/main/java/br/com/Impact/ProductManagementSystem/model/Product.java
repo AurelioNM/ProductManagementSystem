@@ -1,5 +1,6 @@
 package br.com.Impact.ProductManagementSystem.model;
 
+import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -23,14 +24,24 @@ public class Product {
     @NotNull @Digits(integer = 15, fraction = 2)
     private BigDecimal priceBRL;
     @Transient
-    private static List<String> cureenciesList = Arrays.asList("USD", "USDT", "CAD", "GBP", "ARS", "BTC", "LTC", "EUR", "JPY", "CHF", "AUD", "CNY", "ILS", "ETH", "XRP", "DOGE");
+    public static List<String> currenciesList = Arrays.asList("USD", "USDT", "CAD", "GBP", "ARS", "BTC", "LTC", "EUR", "JPY", "CHF", "AUD", "CNY", "ILS", "ETH", "XRP", "DOGE");
 
 
     public Product() { }
 
-    public Product(String name, BigDecimal price) {
+    public Product(String name, BigDecimal priceBRL) {
         this.name = name;
         this.priceBRL = priceBRL;
+    }
+
+    public Product update(Long id, ProductRepository productRepository) {
+        Product product = productRepository.getById(id);
+
+        product.setName(this.name);
+        product.setPriceBRL(this.priceBRL);
+        product.setUpdatedAt(LocalDateTime.now());
+
+        return product;
     }
 
     public Long getId() {
