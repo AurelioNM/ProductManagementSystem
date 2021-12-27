@@ -4,6 +4,8 @@ import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.model.Product;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +21,7 @@ import java.util.*;
 @RequestMapping("/Products")
 public class BRLProductController {
 
-    private String stringJson = convertJsonToString("https://economia.awesomeapi.com.br/all");
+    private String stringJson;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -27,8 +29,7 @@ public class BRLProductController {
     @Autowired
     private ProductRepository productRepository;
 
-    public BRLProductController() throws Exception {
-    }
+    public BRLProductController() throws Exception {}
 
     public String convertJsonToString(String link) throws Exception {
         URL url = new URL(link);
@@ -42,15 +43,19 @@ public class BRLProductController {
 
 
     @GetMapping
-    public List<ProductDTO> getProducts() {
+    @Cacheable(value = "getCurrencies")
+    public List<ProductDTO> getProducts() throws Exception {
 
+        this.stringJson = convertJsonToString("https://economia.awesomeapi.com.br/all");
         List<Product> products = productRepository.findAll();
         return ProductDTO.convertToDTO(products, stringJson);
     }
 
     @GetMapping("/{id}")
+    @Cacheable(value = "getCurrencies")
     public ResponseEntity<ProductDTO> getProductByID(@PathVariable Long id) throws Exception{
 
+        this.stringJson = convertJsonToString("https://economia.awesomeapi.com.br/all");
         Optional<Product> product = productRepository.findById(id);
         return product
                 .map(value -> {
@@ -67,6 +72,7 @@ public class BRLProductController {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value = "getCurrencies", allEntries = true)
     public ResponseEntity<ProductDTO> postProduct(@RequestBody @Valid Product product, UriComponentsBuilder uriBuilder) throws Exception {
 
         productRepository.save(product);
@@ -77,6 +83,7 @@ public class BRLProductController {
 
     @PutMapping("/{id}")
     @Transactional
+    @CacheEvict(value = "getCurrencies", allEntries = true)
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody @Valid Product product) throws Exception {
 
         Optional<Product> optional = productRepository.findById(id);
@@ -89,6 +96,7 @@ public class BRLProductController {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value = "getCurrencies", allEntries = true)
     public ResponseEntity<?> deleteProductById(@PathVariable Long id) {
 
         Optional<Product> product = productRepository.findById(id);
