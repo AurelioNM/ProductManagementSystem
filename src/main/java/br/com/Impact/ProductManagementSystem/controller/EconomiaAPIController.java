@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/Currency")
-public class CurrencyProductController {
+public class EconomiaAPIController {
 
     @Autowired
     private RestTemplate restTemplate;

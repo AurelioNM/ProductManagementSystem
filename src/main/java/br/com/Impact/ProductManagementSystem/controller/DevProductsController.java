@@ -1,11 +1,12 @@
 package br.com.Impact.ProductManagementSystem.controller;
 
-import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.model.Product;
+import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -15,11 +16,14 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
+@Profile("dev")
 @RestController
 @RequestMapping("/Products")
-public class BRLProductController {
+public class DevProductsController {
 
     private String stringJson;
 
@@ -29,7 +33,7 @@ public class BRLProductController {
     @Autowired
     private ProductRepository productRepository;
 
-    public BRLProductController() throws Exception {}
+    public DevProductsController() throws Exception {}
 
     public String convertJsonToString(String link) throws Exception {
         URL url = new URL(link);
