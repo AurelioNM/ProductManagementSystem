@@ -69,7 +69,6 @@ public class ProductsController {
                     return null;
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 
     @PostMapping

@@ -11,31 +11,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Profile("prod")
-public class ProductDTO {
+@Profile("dev")
+public class DevProductDTO {
 
     private Long id;
     private String name;
     private BigDecimal priceBRL;
-    private Map<String, BigDecimal> otherCurrencies = new HashMap<>();
+    private HashMap<String, BigDecimal> otherCurrencies = new HashMap<>();
 
-    public ProductDTO(Product product) {
+    public DevProductDTO(Product product) {
         this.id = product.getId();
         this.name = product.getName();
         this.priceBRL = product.getPriceBRL();
     }
 
-    public ProductDTO(Product product, String json) throws Exception {
+    public DevProductDTO(Product product, String json) throws Exception {
         this.id = product.getId();
         this.name = product.getName();
         this.priceBRL = product.getPriceBRL();
         buildMap(json);
     }
 
-    public static List<ProductDTO> convertToDTO(List<Product> products, String json){
+    public static List<DevProductDTO> convertToDTO(List<Product> products, String json){
         return products.stream().map(product -> {
             try {
-                return new ProductDTO(product, json);
+                return new DevProductDTO(product, json);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -67,7 +67,7 @@ public class ProductDTO {
         return priceBRL;
     }
 
-    public Map<String, BigDecimal> getOtherCurrencies() {
+    public HashMap<String, BigDecimal> getOtherCurrencies() {
         return otherCurrencies;
     }
 }
