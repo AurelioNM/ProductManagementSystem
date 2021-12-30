@@ -1,8 +1,6 @@
 package br.com.Impact.ProductManagementSystem.model.dto;
 
 import br.com.Impact.ProductManagementSystem.model.Product;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Profile;
 
 import java.math.BigDecimal;
@@ -19,40 +17,27 @@ public class ProductDTO {
     private BigDecimal priceBRL;
     private Map<String, BigDecimal> otherCurrencies = new HashMap<>();
 
-    public ProductDTO(Product product) {
+
+    public ProductDTO(Product product, Map<String, BigDecimal> jsonMap) throws Exception {
         this.id = product.getId();
         this.name = product.getName();
         this.priceBRL = product.getPriceBRL();
+
+        for (String key : jsonMap.keySet()) {
+            BigDecimal values = jsonMap.get(key).multiply(this.priceBRL);
+            otherCurrencies.put(key, values.setScale(2, RoundingMode.HALF_EVEN));
+        }
     }
 
-    public ProductDTO(Product product, String json) throws Exception {
-        this.id = product.getId();
-        this.name = product.getName();
-        this.priceBRL = product.getPriceBRL();
-        buildMap(json);
-    }
-
-    public static List<ProductDTO> convertToDTO(List<Product> products, String json){
+    public static List<ProductDTO> convertToDTO(List<Product> products, Map<String, BigDecimal> jsonMap){
         return products.stream().map(product -> {
             try {
-                return new ProductDTO(product, json);
+                return new ProductDTO(product, jsonMap);
             } catch (Exception e) {
                 e.printStackTrace();
+                return null;
             }
-            return null;
         }).toList();
-    }
-
-    private void buildMap(String json) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Map<String, String>> map = mapper.readValue(json, Map.class);
-
-
-        for (String currency : Product.currenciesList) {
-            double currencies = Double.parseDouble(map.get(currency).get("ask"));
-            BigDecimal bigDecimalValue = new BigDecimal(currencies).multiply(priceBRL);
-            otherCurrencies.put(currency, bigDecimalValue.setScale(2, RoundingMode.HALF_EVEN));
-        }
     }
 
     public Long getId() {
