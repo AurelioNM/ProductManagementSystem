@@ -1,15 +1,21 @@
 package br.com.Impact.ProductManagementSystem.controller;
 
-import br.com.Impact.ProductManagementSystem.model.Currencies;
+import br.com.Impact.ProductManagementSystem.model.Product;
+import br.com.Impact.ProductManagementSystem.model.dto.DevProductDTO;
+import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
+import br.com.Impact.ProductManagementSystem.service.MappingJsonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.net.URI;
 import java.util.*;
 
 @Profile("dev")
@@ -17,26 +23,67 @@ import java.util.*;
 @RequestMapping("/Products")
 public class DevProductsController {
 
-    private String stringJson;
-
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private MappingJsonService mappingJsonService;
+
+    public Map<String, BigDecimal> getJsonMapFromService() {
+        Map<String, BigDecimal> jsonMap = mappingJsonService.getJsonMap();
+        return jsonMap;
+    }
+
     @GetMapping
-    public Map<String, Currencies> getMoney() {
+    public List<DevProductDTO> getProducts() {
+        List<Product> products = productRepository.findAll();
+        return DevProductDTO.convertToDTO(products, getJsonMapFromService());
+    }
 
-        ParameterizedTypeReference<HashMap<String, Currencies>> responseType = new ParameterizedTypeReference<>() {};
+    @GetMapping("{id}")
+    public ResponseEntity<DevProductDTO> getProductById(@PathVariable Long id) {
+        Optional<Product> product = productRepository.findById(id);
+        return product.map(p -> {
+            try {
+                return ResponseEntity.ok(new DevProductDTO(p, getJsonMapFromService()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-        RequestEntity<Void> request = RequestEntity.get("https://economia.awesomeapi.com.br/all").accept(MediaType.APPLICATION_JSON).build();
+    @PostMapping
+    @Transactional
+    public ResponseEntity<DevProductDTO> postProduct(@RequestBody @Valid Product product, UriComponentsBuilder uriBuilder) throws Exception {
+        productRepository.save(product);
 
-        Map<String, Currencies> jsonDictionary = restTemplate.exchange(request, responseType).getBody();
+        URI uri = uriBuilder.path("Products/{id}").buildAndExpand(product.getId()).toUri();
+        return ResponseEntity.created(uri).body(new DevProductDTO(product, getJsonMapFromService()));
+    }
 
-        return jsonDictionary;
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<DevProductDTO> updateProduct(@PathVariable Long id, @RequestBody @Valid Product product) throws Exception {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product updatedProduct = product.update(id, productRepository);
+            return ResponseEntity.ok(new DevProductDTO(updatedProduct, getJsonMapFromService()));
+        }
+        return ResponseEntity.notFound().build();
+    }
 
-
-
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteProductById(@PathVariable Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            productRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

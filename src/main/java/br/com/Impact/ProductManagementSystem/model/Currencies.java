@@ -1,14 +1,16 @@
 package br.com.Impact.ProductManagementSystem.model;
 
+import java.math.BigDecimal;
+
 public class Currencies {
 
-    private Double ask;
+    private BigDecimal ask;
 
-    public Double getAsk() {
+    public BigDecimal getAsk() {
         return ask;
     }
 
-    public void setAsk(Double ask) {
+    public void setAsk(BigDecimal ask) {
         this.ask = ask;
     }
 }
