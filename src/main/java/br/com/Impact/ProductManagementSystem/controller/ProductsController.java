@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 
-@Profile("prod")
 @RestController
 @RequestMapping("/Products")
 public class ProductsController {
