@@ -3,6 +3,7 @@ package br.com.Impact.ProductManagementSystem.controller;
 import br.com.Impact.ProductManagementSystem.model.Product;
 import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
+import br.com.Impact.ProductManagementSystem.service.ConvertToDTOService;
 import br.com.Impact.ProductManagementSystem.service.MappingJsonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class ProductsController {
     @GetMapping
     public List<ProductDTO> getProducts() {
         List<Product> products = productRepository.findAll();
-        return ProductDTO.convertToDTO(products, getJsonMapFromService());
+        return ConvertToDTOService.convertToDTO(products, getJsonMapFromService());
     }
 
     @GetMapping("{id}")
