@@ -5,7 +5,6 @@ import br.com.Impact.ProductManagementSystem.model.dto.ProductDTO;
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import br.com.Impact.ProductManagementSystem.service.MappingJsonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -15,7 +14,9 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/Products")
@@ -31,8 +32,7 @@ public class ProductsController {
     private MappingJsonService mappingJsonService;
 
     public Map<String, BigDecimal> getJsonMapFromService() {
-        Map<String, BigDecimal> jsonMap = mappingJsonService.getJsonMap();
-        return jsonMap;
+        return mappingJsonService.getJsonMap();
     }
 
     @GetMapping
