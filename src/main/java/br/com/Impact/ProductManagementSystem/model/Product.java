@@ -2,7 +2,6 @@ package br.com.Impact.ProductManagementSystem.model;
 
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.context.annotation.Profile;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;

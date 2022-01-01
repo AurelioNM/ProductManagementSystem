@@ -2,6 +2,8 @@ package br.com.Impact.ProductManagementSystem.controller;
 
 import br.com.Impact.ProductManagementSystem.repository.ProductRepository;
 import br.com.Impact.ProductManagementSystem.service.MappingJsonService;
+import ch.qos.logback.classic.Logger;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/Currency")
 public class EconomiaAPIController {
+
 
     @Autowired
     private RestTemplate restTemplate;
